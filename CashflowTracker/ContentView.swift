@@ -72,24 +72,34 @@ struct ContentView: View {
     private func monthView(for month: Binding<MonthlyCashflow>) -> some View {
         NavigationStack {
             List {
-                Section(header: Text(month.wrappedValue.monthName).font(.title3).bold()) {
-                    PeriodSection(
-                        period: month.firstHalf,
-                        allSources: allSources,
-                        allAccounts: allAccounts
-                    )
-                    PeriodSection(
-                        period: month.secondHalf,
-                        allSources: allSources,
-                        allAccounts: allAccounts
-                    )
-                }
+                // Periods
+                PeriodSection(
+                    period: Binding(
+                        get: { month.wrappedValue.firstHalf },
+                        set: { month.wrappedValue.firstHalf = $0 }
+                    ),
+                    allSources: allSources,
+                    allAccounts: allAccounts
+                )
 
+                PeriodSection(
+                    period: Binding(
+                        get: { month.wrappedValue.secondHalf },
+                        set: { month.wrappedValue.secondHalf = $0 }
+                    ),
+                    allSources: allSources,
+                    allAccounts: allAccounts
+                )
+
+                // Summary
                 summarySection(for: month.wrappedValue)
 
+                // Manage
                 manageSection
             }
+            .listStyle(.insetGrouped)
             .navigationTitle(month.wrappedValue.monthName)
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
@@ -159,7 +169,6 @@ struct ContentView: View {
         }
     }
 }
-
 // MARK: - Preview
 #Preview {
     ContentView()
