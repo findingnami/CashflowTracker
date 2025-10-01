@@ -49,30 +49,53 @@ struct ContentView: View {
 
         _allSources = State(initialValue: store.load([IncomeSource].self, forKey: "income_sources") ?? [])
         _allAccounts = State(initialValue: store.load([Account].self, forKey: "accounts") ?? [])
+        
+        // Make TabBar solid
+            let tabBarAppearance = UITabBarAppearance()
+            tabBarAppearance.configureWithOpaqueBackground() // makes it solid
+            tabBarAppearance.backgroundColor = UIColor.systemBackground // or any color you want
+            UITabBar.appearance().standardAppearance = tabBarAppearance
+            UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
     }
 
     var body: some View {
         TabView {
-            monthView(for: $currentMonth)
-                .tabItem {
-                    Label("This Month", systemImage: "calendar")
-                }
+            NavigationStack {
+                monthView(for: $currentMonth)
+                    //.navigationTitle(currentMonth.monthName)
+                    //.navigationBarTitleDisplayMode(.large)
+                    .navigationTitle("")        // hide navigation title
+                    .navigationBarHidden(true)
+            }
+            .tabItem {
+                Label("This Month", systemImage: "calendar")
+            }
 
-            monthView(for: $nextMonth)
-                .tabItem {
-                    Label("Next Month", systemImage: "calendar.badge.plus")
-                }
+            NavigationStack {
+                monthView(for: $nextMonth)
+                    .navigationTitle(nextMonth.monthName)
+                    .navigationBarTitleDisplayMode(.large)
+            }
+            .tabItem {
+                Label("Next Month", systemImage: "calendar.badge.plus")
+            }
         }
         .onDisappear {
             saveMonths()
         }
     }
 
-    // MARK: - Month Screen
     private func monthView(for month: Binding<MonthlyCashflow>) -> some View {
-        NavigationStack {
+        VStack(alignment: .leading, spacing: 0) {
+            // Month header
+            Text(month.wrappedValue.monthName)
+                .font(.largeTitle)
+                .bold()
+                .padding(.horizontal)
+                .padding(.top, 16)
+                .padding(.bottom, 8)
+
             List {
-                // Periods
                 PeriodSection(
                     period: Binding(
                         get: { month.wrappedValue.firstHalf },
@@ -91,19 +114,13 @@ struct ContentView: View {
                     allAccounts: allAccounts
                 )
 
-                // Summary
                 summarySection(for: month.wrappedValue)
-
-                // Manage
                 manageSection
             }
             .listStyle(.insetGrouped)
-            .navigationTitle(month.wrappedValue.monthName)
-            .navigationBarTitleDisplayMode(.inline)
         }
     }
 
-    // MARK: - Summary
     private func summarySection(for month: MonthlyCashflow) -> some View {
         let totalIncome = month.firstHalf.totalIncome + month.secondHalf.totalIncome
         let totalExpenses = month.firstHalf.totalExpenses + month.secondHalf.totalExpenses
@@ -129,7 +146,6 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - Manage
     private var manageSection: some View {
         Section {
             NavigationLink("Manage Income Sources") {
@@ -161,7 +177,6 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - Save
     private func saveMonths() {
         let months = [currentMonth, nextMonth]
         if let encoded = try? JSONEncoder().encode(months) {
@@ -169,6 +184,8 @@ struct ContentView: View {
         }
     }
 }
+
+
 // MARK: - Preview
 #Preview {
     ContentView()
