@@ -7,82 +7,159 @@
 
 import SwiftUI
 
-
 struct ContentView: View {
-    @State private var months: [MonthlyCashflow]
+    private let store = DataStore()
+
+    // single-month state (the "one month" model you decided on)
+    @State private var currentMonth: MonthlyCashflow
     @State private var allSources: [IncomeSource]
     @State private var allAccounts: [Account]
+
     @State private var showAddIncomeSource = false
     @State private var showAddAccount = false
+    @State private var showClearMonthAlert = false
 
-    init(
-        months: [MonthlyCashflow] = [],
-        allSources: [IncomeSource] = [],
-        allAccounts: [Account] = []
-    ) {
-        _months = State(initialValue: months)
-        _allSources = State(initialValue: allSources)
-        _allAccounts = State(initialValue: allAccounts)
+    // load saved data (or create a fresh month)
+    init() {
+        // load persisted month (if any)
+        if let data = UserDefaults.standard.data(forKey: "cashflow_currentMonth"),
+           let decoded = try? JSONDecoder().decode(MonthlyCashflow.self, from: data) {
+            _currentMonth = State(initialValue: decoded)
+        } else {
+            _currentMonth = State(initialValue:
+                MonthlyCashflow(
+                    monthName: Date().monthNameAndYear(),
+                    firstHalf: CashflowPeriod(name: "First Half", incomes: [], expenses: []),
+                    secondHalf: CashflowPeriod(name: "Second Half", incomes: [], expenses: [])
+                )
+            )
+        }
+
+        // load sources/accounts lists
+        _allSources = State(initialValue: store.load([IncomeSource].self, forKey: "income_sources") ?? [])
+        _allAccounts = State(initialValue: store.load([Account].self, forKey: "accounts") ?? [])
     }
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach($months) { $month in
-                        // Month title at the very top (no Section styling)
-                       /* Text(month.monthName)
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .padding(.top, 12) */
-
-                        // ── First Half ──
-                        Section {
-                            PeriodSection(
-                                period: $month.firstHalf,
-                                allSources: allSources,
-                                allAccounts: allAccounts
-                            )
-                        }
-
-                        // ── Second Half ──
-                        Section {
-                            PeriodSection(
-                                period: $month.secondHalf,
-                                allSources: allSources,
-                                allAccounts: allAccounts
-                            )
-                        }
-                    }
-
-
-                Section {
-                    Button("Add Income Source") { showAddIncomeSource = true }
-                        .sheet(isPresented: $showAddIncomeSource) {
-                            AddIncomeSourceView { allSources.append($0) }
-                        }
-
-                    Button("Add Account") { showAddAccount = true }
-                        .sheet(isPresented: $showAddAccount) {
-                            AddAccountView { allAccounts.append($0) }
-                        }
-                }
+                monthSection     // 🔹 Month first
+                summarySection   // 🔹 Summary below
+                manageSection
             }
             .navigationTitle("Monthly Cashflow")
+            // show an alert to confirm clearing the month
+            .alert("Clear Current Month?", isPresented: $showClearMonthAlert) {
+                Button("Clear", role: .destructive) {
+                    resetMonth()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This will remove all data for the current month. Are you sure?")
+            }
+            // save when the view disappears (safe fallback)
+            .onDisappear {
+                saveCurrentMonth(currentMonth)
+            }
         }
     }
-}
 
+
+    // MARK: - Month view (first + second half)
+    private var monthSection: some View {
+        Section(header: Text(currentMonth.monthName).font(.title3).bold()) {
+            PeriodSection(
+                period: $currentMonth.firstHalf,
+                allSources: allSources,
+                allAccounts: allAccounts
+            )
+
+            PeriodSection(
+                period: $currentMonth.secondHalf,
+                allSources: allSources,
+                allAccounts: allAccounts
+            )
+        }
+    }
+    
+    // MARK: - Totals / Summary
+    private var totalIncome: Double {
+        currentMonth.firstHalf.totalIncome + currentMonth.secondHalf.totalIncome
+    }
+
+    private var totalExpenses: Double {
+        currentMonth.firstHalf.totalExpenses + currentMonth.secondHalf.totalExpenses
+    }
+
+    private var summarySection: some View {
+        Section(header: Text("Summary").font(.headline)) {
+            HStack {
+                Text("Total Income").foregroundStyle(.secondary)
+                Spacer()
+                Text(totalIncome, format: .currency(code: "PHP"))
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text("Total Expenses").foregroundStyle(.secondary)
+                Spacer()
+                Text(totalExpenses, format: .currency(code: "PHP"))
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text("Balance").foregroundStyle(.secondary)
+                Spacer()
+                Text((totalIncome - totalExpenses), format: .currency(code: "PHP"))
+                    .foregroundColor(totalIncome >= totalExpenses ? .secondary : .red)
+            }
+        }
+    }
+
+    // MARK: - Manage / Add buttons
+    private var manageSection: some View {
+        Section {
+            Button("➕ Add Income Source") {
+                showAddIncomeSource = true
+            }
+            .sheet(isPresented: $showAddIncomeSource) {
+                AddIncomeSourceView { newSource in
+                    allSources.append(newSource)
+                    store.save(allSources, forKey: "income_sources")
+                }
+            }
+
+            Button("➕ Add Account") {
+                showAddAccount = true
+            }
+            .sheet(isPresented: $showAddAccount) {
+                AddAccountView { newAccount in
+                    allAccounts.append(newAccount)
+                    store.save(allAccounts, forKey: "accounts")
+                }
+            }
+
+            Button("🗑️ Clear Month") {
+                showClearMonthAlert = true
+            }
+            .foregroundColor(.red)
+        }
+    }
+
+    // MARK: - Persistence helpers
+    private func saveCurrentMonth(_ month: MonthlyCashflow) {
+        guard let encoded = try? JSONEncoder().encode(month) else { return }
+        UserDefaults.standard.set(encoded, forKey: "cashflow_currentMonth")
+    }
+
+    private func resetMonth() {
+        currentMonth = MonthlyCashflow(
+            monthName: Date().monthNameAndYear(),
+            firstHalf: CashflowPeriod(name: "First Half", incomes: [], expenses: []),
+            secondHalf: CashflowPeriod(name: "Second Half", incomes: [], expenses: [])
+        )
+        saveCurrentMonth(currentMonth)
+    }
+}
 // MARK: - Preview
 #Preview {
-    ContentView(
-        months: [
-            MonthlyCashflow(
-                monthName: "September 2025",
-                firstHalf: CashflowPeriod(name: "First Half", incomes: [], expenses: []),
-                secondHalf: CashflowPeriod(name: "Second Half", incomes: [], expenses: [])
-            )
-        ],
-        allSources: [IncomeSource(name: "Salary")],
-        allAccounts: [Account(name: "BDO Savings")]
-    )
+    ContentView()
 }

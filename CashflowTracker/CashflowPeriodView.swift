@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Identifies which sheet is currently active.
-enum ActiveSheet: Identifiable {
+enum ActiveSheet: Identifiable, Codable {
     case income, expense
     var id: Int { hashValue }
 }

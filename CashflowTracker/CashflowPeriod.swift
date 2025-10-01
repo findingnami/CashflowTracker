@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CashflowPeriod: Identifiable, Codable {
+struct CashflowPeriod: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var name: String
     var incomes: [Income]

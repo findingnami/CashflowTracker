@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct MonthlyCashflow: Identifiable {
-    let id = UUID()
+struct MonthlyCashflow: Identifiable, Codable, Equatable {
+    var id = UUID()
     let monthName: String
     var firstHalf: CashflowPeriod
     var secondHalf: CashflowPeriod

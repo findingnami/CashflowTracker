@@ -6,7 +6,7 @@
 //
 import Foundation
 
-struct Allocation: Identifiable, Codable {
+struct Allocation: Identifiable, Codable, Equatable {
     var id: UUID = UUID()
     var account: String
     var total: Double
