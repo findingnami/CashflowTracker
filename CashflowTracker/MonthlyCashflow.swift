@@ -13,3 +13,4 @@ struct MonthlyCashflow: Identifiable, Codable, Equatable {
     var firstHalf: CashflowPeriod
     var secondHalf: CashflowPeriod
 }
+
