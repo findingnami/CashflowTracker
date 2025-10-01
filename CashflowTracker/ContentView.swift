@@ -24,8 +24,23 @@ struct ContentView: View {
         // load persisted month (if any)
         if let data = UserDefaults.standard.data(forKey: "cashflow_currentMonth"),
            let decoded = try? JSONDecoder().decode(MonthlyCashflow.self, from: data) {
-            _currentMonth = State(initialValue: decoded)
+
+            // Check if it's still the same month
+            if decoded.monthName == Date().monthNameAndYear() {
+                _currentMonth = State(initialValue: decoded)
+            } else {
+                // New month -> reset
+                _currentMonth = State(initialValue:
+                    MonthlyCashflow(
+                        monthName: Date().monthNameAndYear(),
+                        firstHalf: CashflowPeriod(name: "First Half", incomes: [], expenses: []),
+                        secondHalf: CashflowPeriod(name: "Second Half", incomes: [], expenses: [])
+                    )
+                )
+            }
+
         } else {
+            // no saved month -> create fresh
             _currentMonth = State(initialValue:
                 MonthlyCashflow(
                     monthName: Date().monthNameAndYear(),
@@ -117,6 +132,14 @@ struct ContentView: View {
     // MARK: - Manage / Add buttons
     private var manageSection: some View {
         Section {
+            NavigationLink("Manage Income Sources") {
+                        ManageIncomeSourcesView(sources: $allSources)
+                    }
+
+            NavigationLink("Manage Accounts") {
+                        ManageAccountsView(accounts: $allAccounts)
+                    }
+            
             Button("➕ Add Income Source") {
                 showAddIncomeSource = true
             }
