@@ -8,20 +8,57 @@
 import SwiftUI
 
 // IncomeSectionView.swift
+
 struct IncomeSectionView: View {
     @Binding var period: CashflowPeriod
     var onAdd: () -> Void
 
+    // Track which income to edit
+    @State private var incomeToEdit: Income? = nil
+
     var body: some View {
-        // Explicitly reference SwiftUI.Section to avoid any name collisions
         SwiftUI.Section(header: Text("Income")) {
             headerView
-            incomeRows
+
+            ForEach($period.incomes) { $income in
+                IncomeRow(income: $income)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        // Delete button
+                        Button(role: .destructive) {
+                            if let index = period.incomes.firstIndex(where: { $0.id == income.id }) {
+                                period.incomes.remove(at: index)
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        
+                        // Edit button
+                        Button {
+                            incomeToEdit = income
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                        .tint(.blue)
+
+                        
+                    }
+            }
+
             totalView
+        }
+        .sheet(item: $incomeToEdit) { editingIncome in
+            if let binding = bindingForIncome(editingIncome) {
+                EditIncomeView(income: binding)
+            }
         }
     }
 
-    // MARK: - Subpieces kept tiny to help the compiler
+    private func bindingForIncome(_ income: Income) -> Binding<Income>? {
+        guard let index = period.incomes.firstIndex(where: { $0.id == income.id }) else {
+            return nil
+        }
+        return $period.incomes[index]
+    }
 
     private var headerView: some View {
         HStack {
@@ -32,14 +69,7 @@ struct IncomeSectionView: View {
             Button(action: onAdd) {
                 Image(systemName: "plus")
             }
-            .buttonStyle(.borderless) // nice inside lists
-        }
-    }
-
-    @ViewBuilder
-    private var incomeRows: some View {
-        ForEach($period.incomes) { $income in
-            IncomeRow(income: $income)
+            .buttonStyle(.borderless)
         }
     }
 
@@ -50,7 +80,7 @@ struct IncomeSectionView: View {
     }
 }
 
-// Small row view — separated so the compiler has very tiny expressions to check
+// MARK: - Row
 struct IncomeRow: View {
     @Binding var income: Income
 
@@ -63,11 +93,6 @@ struct IncomeRow: View {
             }
             .buttonStyle(.borderless)
 
-            // NOTE: depending on your IncomeSource model:
-            // • if IncomeSource is now a @Model class with `var name: String` use `.name`
-            // • if it's still an enum use `.rawValue`
-            //
-            // I'll show the class-name version below; change to `.rawValue` if you still have an enum.
             Text(income.source)
                 .foregroundColor(income.isReceived ? .primary : .gray)
 
@@ -80,6 +105,41 @@ struct IncomeRow: View {
     }
 }
 
+// MARK: - Simple Editor for Income
+struct EditIncomeView: View {
+    @Binding var income: Income
+    @Environment(\.dismiss) private var dismiss
 
+    @State private var amount: String = ""
 
-
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Source") {
+                    Text(income.source)
+                }
+                Section("Amount") {
+                    TextField("Amount", text: $amount)
+                        .keyboardType(.decimalPad)
+                }
+            }
+            .navigationTitle("Edit Income")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        if let newAmount = Double(amount) {
+                            income.amount = newAmount
+                        }
+                        dismiss()
+                    }
+                }
+            }
+        }
+        .onAppear {
+            amount = String(income.amount)
+        }
+    }
+}
