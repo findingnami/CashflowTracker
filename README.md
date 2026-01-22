@@ -9,11 +9,11 @@ A **Next Month** view allows users to plan and adjust their budget in advance, s
 ## Screenshots
 
 <p align="center">
-  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-1.png" width="45%" alt="First Month">
-  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-2.png" width="45%" alt="Second Month">
+  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-1.PNG" width="45%" alt="First Month">
+  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-2.PNG" width="45%" alt="Second Month">
   
-  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-3.png" width="45%" alt="First Half">
-  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-4.png" width="45%" alt="Second Half">
+  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-3.PNG" width="45%" alt="First Half">
+  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-4.PNG" width="45%" alt="Second Half">
 </p>
 
 ## Features
