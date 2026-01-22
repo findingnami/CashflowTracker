@@ -17,40 +17,39 @@ A **Next Month** view allows users to plan and adjust their budget in advance, s
 </p>
 
 ## Features
-	•	Bi-Monthly Cashflow Tracking
-Separate views for the first and second half of the month.
-	•	Income & Expense Management
-Add, edit, and categorize cashflows with ease.
-	•	Custom Income/Expense Accounts
-Fully customizable account allocations (e.g. BPI, GoTyme, Maribank).
-	•	Automatic Calculations
-Computes total expected expenses per bank account to support better budgeting.
-	•	Next Month Planning
-Plan and adjust budgets in advance before the new month starts.
-	•	Clean & Focused UI
-Designed for clarity and everyday personal use.
+	
+•	Bi-Monthly Cashflow Tracking
+	Separate views for the first and second half of the month.
+•	Income & Expense Management
+	Add, edit, and categorize cashflows with ease.
+•	Custom Income/Expense Accounts
+	Fully customizable account allocations (e.g. BPI, GoTyme, Maribank).
+•	Automatic Calculations
+	Computes total expected expenses per bank account to support better budgeting.
+•	Next Month Planning
+	Plan and adjust budgets in advance before the new month starts.
+•	Clean & Focused UI
+	Designed for clarity and everyday personal use.
 
 ## Installation
 
 Requirements
-	•	Xcode (latest stable version recommended)
-	•	iOS device or simulator
-	•	macOS
+•	Xcode (latest stable version recommended)
+•	iOS device or simulator
+•	macOS
 
 Steps
-	1.	Clone the repository:
-  git clone https://github.com/your-username/CashflowTracker.git
-  2.	Open the project in Xcode:
-  open CashflowTracker.xcodeproj
-  3.	Select a simulator or connected iPhone.
-	4.	Build and run the app.
+1.	Clone the repository: git clone https://github.com/your-username/CashflowTracker.git
+2.	Open the project in Xcode: open CashflowTracker.xcodeproj
+3.	Select a simulator or connected iPhone.
+4.	Build and run the app.
 
 ## Usage
-	1.	Create or customize your bank accounts.
-	2.	Enter income and expenses for each half of the month.
-	3.	Review automatically calculated totals per account.
-	4.	Use the Next Month tab to plan upcoming budgets.
-	5.	Adjust allocations to maintain a healthy cashflow.
+1.	Create or customize your bank accounts.
+2.	Enter income and expenses for each half of the month.
+3.	Review automatically calculated totals per account.
+4.	Use the Next Month tab to plan upcoming budgets.
+5.	Adjust allocations to maintain a healthy cashflow.
 
 ## Tech Stack
 	•	Swift
