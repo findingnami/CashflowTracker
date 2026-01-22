@@ -9,11 +9,11 @@ A **Next Month** view allows users to plan and adjust their budget in advance, s
 ## Screenshots
 
 <p align="center">
-  <img src="https://github.com/msmariarachel/WeSplit/blob/main/Assets/WeSplitScreenshot1.PNG" width="45%" alt="Main Screen">
-  <img src="https://github.com/msmariarachel/WeSplit/blob/main/Assets/WeSplitScreenshot2.PNG" width="45%" alt="Number of People Selection">
+  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-1.png" width="45%" alt="First Month">
+  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-2.png" width="45%" alt="Second Month">
   
-  <img src="https://github.com/msmariarachel/WeSplit/blob/main/Assets/WeSplitScreenshot3.PNG" width="45%" alt="Final Calculation">
-  <img src="https://github.com/msmariarachel/WeSplit/blob/main/Assets/WeSplitDemo.gif" width="45%" alt="Demo">
+  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-3.png" width="45%" alt="First Half">
+  <img src="https://github.com/findingnami/CashflowTracker/blob/main/screenshots/CashflowTracker-4.png" width="45%" alt="Second Half">
 </p>
 
 ## Features
